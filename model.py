@@ -10,20 +10,20 @@ import tensorflow as tf
 import numpy as np
 from config import *
 
-def buildModel(wordNum, gtX, hidden_units = 128, layers = 2):
+def buildModel(wordNum, gtX):
     """build rnn"""
     with tf.variable_scope("embedding"): #embedding
-        embedding = tf.get_variable("embedding", [wordNum, hidden_units], dtype = tf.float32)
+        embedding = tf.get_variable("embedding", [wordNum, rnn_hidden_layer_size], dtype = tf.float32)
         inputbatch = tf.nn.embedding_lookup(embedding, gtX)
 
-    basicCell = tf.contrib.rnn.BasicLSTMCell(hidden_units, state_is_tuple = True)
-    stackCell = tf.contrib.rnn.MultiRNNCell([basicCell] * layers)
+    basicCell = tf.contrib.rnn.BasicLSTMCell(rnn_hidden_layer_size, state_is_tuple = True)
+    stackCell = tf.contrib.rnn.MultiRNNCell([basicCell] * rnn_layers)
     initState = stackCell.zero_state(np.shape(gtX)[0], tf.float32)
     outputs, finalState = tf.nn.dynamic_rnn(stackCell, inputbatch, initial_state = initState)
-    outputs = tf.reshape(outputs, [-1, hidden_units])
+    outputs = tf.reshape(outputs, [-1, rnn_hidden_layer_size])
 
     with tf.variable_scope("softmax"):
-        w = tf.get_variable("w", [hidden_units, wordNum])
+        w = tf.get_variable("w", [rnn_hidden_layer_size, wordNum])
         b = tf.get_variable("b", [wordNum])
         logits = tf.matmul(outputs, w) + b
 

@@ -15,16 +15,11 @@ def pretreatment(filename):
     file = open(filename, "r")
     for line in file:  #every line is a poem
         #print(line)
-        title, poem = line.strip().split(":")  #get title and poem
-        poem = poem.replace(' ','')
-        if '_' in poem or '《' in poem or '[' in poem or '(' in poem or '（' in poem:
-            continue
-        if len(poem) < 10 or len(poem) > 128:  #filter poem
-            continue
+        poem = line.strip()
+        poem = poem.replace(' ','').replace('[','').replace('(','').replace('（','')
         poem = '[' + poem + ']' #add start and end signs
         poems.append(poem)
 
-    print("唐诗总数： %d"%len(poems))
     #counting words
     allWords = {}
     for poem in poems:
